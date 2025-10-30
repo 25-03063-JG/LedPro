@@ -22,8 +22,9 @@ body{
 .container{max-width:var(--container);margin:0 auto;padding:24px}
 .site-header{border-bottom:1px solid rgba(255,255,255,0.03);background:transparent;position:sticky;top:0;backdrop-filter: blur(6px);z-index:10}
 .header-row{display:flex;align-items:center;gap:16px;justify-content:space-between}
-.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text)}
-.brand .logo{width:52px;height:52px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text);min-width:0}
+.brand .logo{height:64px;width:auto;display:block;object-fit:contain}
+.brand-text{font-weight:700;letter-spacing:1px}
 nav a{color:var(--muted);text-decoration:none;margin-left:14px}
 nav a:hover{color:var(--text)}
 .hero{padding:36px 0;text-align:center;border-radius:12px}
@@ -42,7 +43,7 @@ nav a:hover{color:var(--text)}
 .card{background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
 .estimator{margin-top:18px}
 .form-row{display:flex;flex-direction:column;margin-bottom:12px}
-.form-row.small{max-width:260px}
+.form-row.small{max-width:320px}
 fieldset{border:1px dashed rgba(255,255,255,0.03);padding:12px;margin-bottom:12px;border-radius:8px}
 fieldset label{display:block;margin-bottom:8px}
 input[type="number"], input[type="text"], select{padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)}
@@ -54,4 +55,4 @@ input[type="number"], input[type="text"], select{padding:8px 10px;border-radius:
 .tagline-small{color:var(--muted);margin-top:8px}
 .form-actions{margin-top:12px;display:flex;gap:8px}
 .site-footer{border-top:1px solid rgba(255,255,255,0.03);padding:14px 0;margin-top:30px;color:var(--muted);font-size:14px;text-align:center}
-@media (max-width:700px){.hero-title{font-size:28px}.site-header .container{padding:8px 0}.form-actions{flex-direction:column}}
+@media (max-width:700px){.hero-title{font-size:28px}.site-header .container{padding:8px 0}.form-actions{flex-direction:column}.brand .logo{height:48px}}

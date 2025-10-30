@@ -1,13 +1,21 @@
-// Interactive estimator for LedPro
-// Keeps everything client-side; opens mailto to request a formal quote.
+// Estimator updated for size-based pricing (PHP) and full-logo header balance.
 
 (function(){
+  // Base LED wall prices by size (PHP)
+  const sizePrices = {
+    '6x9': 12000,
+    '9x12': 14000,
+    '9x18': 16000,
+    '9x24': 18000
+  };
+
+  // Extra services (PHP)
   const prices = {
-    consultation: { type: 'flat', value: 50 },
-    design: { type: 'per_m', value: 30 },
-    hardware: { type: 'per_m', value: 10 },
-    installation: { type: 'per_m', value: 20 },
-    controller: { type: 'per_item', value: 40 }
+    consultation: { type: 'flat', value: 2500 },
+    design: { type: 'flat', value: 1500 },
+    hardware: { type: 'flat', value: 2000 },
+    installation: { type: 'flat', value: 3000 },
+    controller: { type: 'per_item', value: 2000 }
   };
 
   const discountCodes = {
@@ -16,9 +24,9 @@
   };
 
   const el = {
-    length: document.getElementById('length'),
-    controllers: document.getElementById('controllers'),
-    complexity: document.getElementById('complexity'),
+    size: document.getElementById('size'),
+    transaction: document.getElementById('transaction'),
+    quantity: document.getElementById('quantity'),
     discount: document.getElementById('discount'),
     breakdown: document.getElementById('breakdown'),
     totalAmount: document.getElementById('totalAmount'),
@@ -32,66 +40,68 @@
   }
 
   function formatCurrency(n){
-    return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
+    return new Intl.NumberFormat('en-PH',{style:'currency',currency:'PHP'}).format(n);
   }
 
   function calculate(){
-    const meters = Math.max(0, parseFloat(el.length.value) || 0);
-    const controllers = Math.max(0, parseInt(el.controllers.value,10) || 0);
-    const complexityFactor = parseFloat(el.complexity.value) || 1;
+    const sizeKey = el.size.value;
+    const basePrice = sizePrices[sizeKey] || 0;
+    const qty = Math.max(1, parseInt(el.quantity.value,10) || 1);
+    const transaction = el.transaction.value; // sale or rent
     const code = (el.discount.value || '').trim().toUpperCase();
     const discount = discountCodes[code] || 0;
 
+    // Rent multiplier (example): daily/short-term rental tends to be fraction of sale price
+    // using 20% of sale price as an example
+    const rentMultiplier = 0.20;
+    const effectiveBase = (transaction === 'rent') ? Math.round(basePrice * rentMultiplier) : basePrice;
+
     const selected = getSelectedServices();
-    let subtotal = 0;
+    let subtotal = effectiveBase * qty;
     const lines = [];
 
-    // Consultation (flat)
+    lines.push({label:`Base price (${sizeKey}) x ${qty}`, amount: effectiveBase * qty});
+
+    // Extras
     if(selected.includes('consultation')){
       const v = prices.consultation.value;
       subtotal += v;
       lines.push({label:'Consultation (flat)', amount:v});
     }
-
-    // Per-meter services
-    ['design','hardware','installation'].forEach(k=>{
-      if(selected.includes(k)){
-        const unit = prices[k].value;
-        const amount = unit * meters;
-        subtotal += amount;
-        const label = `${k[0].toUpperCase()+k.slice(1)} (${meters} m @ ${formatCurrency(unit)}/m)`;
-        lines.push({label, amount});
-      }
-    });
-
-    // Controllers
+    if(selected.includes('design')){
+      const v = prices.design.value;
+      subtotal += v;
+      lines.push({label:'Design (flat)', amount:v});
+    }
+    if(selected.includes('hardware')){
+      const v = prices.hardware.value;
+      subtotal += v;
+      lines.push({label:'Hardware / accessories', amount:v});
+    }
+    if(selected.includes('installation')){
+      const v = prices.installation.value;
+      subtotal += v;
+      lines.push({label:'Installation (flat)', amount:v});
+    }
     if(selected.includes('controller')){
       const unit = prices.controller.value;
-      const amount = unit * controllers;
+      // if controllers not requested as quantity input, assume one per wall
+      const controllersCount = Math.max(0, qty);
+      const amount = unit * controllersCount;
       subtotal += amount;
-      lines.push({label:`Controller setup (${controllers} x ${formatCurrency(unit)})`, amount});
+      lines.push({label:`Controller setup (${controllersCount} x ${formatCurrency(unit)})`, amount});
     }
 
-    // Apply complexity factor
-    const complexAmount = subtotal * (complexityFactor - 1);
-    if(complexAmount > 0){
-      lines.push({label:`Site complexity multiplier x${complexityFactor}`, amount: complexAmount});
-      subtotal += complexAmount;
-    }
-
-    // Discount
+    // Apply discount
     let discountAmount = 0;
     if(discount > 0){
       discountAmount = subtotal * discount;
       lines.push({label:`Discount (${Math.round(discount*100)}%)`, amount: -discountAmount});
     }
 
-    // Estimated tax (optional example) - disabled by default
-    const tax = 0; // e.g. 0.07 for 7%
-    const taxAmount = (subtotal - discountAmount) * tax;
-
-    const total = subtotal - discountAmount + taxAmount;
-    return {lines, total, summary: {meters, controllers, complexityFactor, discountCode: code || null, discountPercent: discount}};
+    // Complexity and tax not applied in this simple estimator (could be added)
+    const total = subtotal - discountAmount;
+    return {lines, total, summary: {size: sizeKey, transaction, quantity: qty, discountCode: code || null, discountPercent: discount}};
   }
 
   function render(){
@@ -122,10 +132,10 @@
     const bodyLines = [
       `LED Pro - Quote Request`,
       ``,
+      `Selected size: ${summary.size}`,
+      `Transaction: ${summary.transaction}`,
+      `Quantity: ${summary.quantity}`,
       `Selected services: ${selected}`,
-      `Total LED length: ${summary.meters} m`,
-      `Controllers: ${summary.controllers}`,
-      `Site complexity factor: ${summary.complexityFactor}`,
       `Discount code: ${summary.discountCode || 'N/A'}`,
       ``,
       `Estimated total: ${el.totalAmount.textContent}`,
