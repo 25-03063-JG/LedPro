@@ -1,9 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" fill="none">
-  <rect rx="20" width="120" height="120" fill="#0b1220"/>
-  <g transform="translate(18,18)">
-    <rect width="84" height="84" rx="14" fill="#071827"/>
-    <path d="M18 24h24v12H18z" fill="#ff7a18"/>
-    <circle cx="54" cy="18" r="6" fill="#2bd4c5"/>
-    <rect x="12" y="48" width="48" height="6" rx="3" fill="#6ea8ff"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" width="480" height="160">
+  <defs>
+    <pattern id="dots-red" width="12" height="12" patternUnits="userSpaceOnUse">
+      <circle cx="6" cy="6" r="4" fill="#d92a2a" />
+    </pattern>
+    <pattern id="dots-green" width="12" height="12" patternUnits="userSpaceOnUse">
+      <circle cx="6" cy="6" r="4" fill="#39d247" />
+    </pattern>
+    <pattern id="dots-blue" width="12" height="12" patternUnits="userSpaceOnUse">
+      <circle cx="6" cy="6" r="4" fill="#2337a8" />
+    </pattern>
+    <style>
+      .title{font:700 34px/1 "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;letter-spacing:4px;}
+    </style>
+  </defs>
+
+  <!-- optional dark rounded backdrop -->
+  <rect x="0" y="0" width="480" height="160" rx="10" fill="#0b1220" />
+
+  <!-- LED dot blocks -->
+  <rect x="36" y="60" width="132" height="72" rx="8" fill="url(#dots-red)" />
+  <rect x="180" y="60" width="132" height="72" rx="8" fill="url(#dots-green)" />
+  <rect x="324" y="60" width="132" height="72" rx="8" fill="url(#dots-blue)" />
+
+  <!-- Text -->
+  <text class="title" x="240" y="40" text-anchor="middle" fill="#e6eef8">LED PRO</text>
 </svg>
